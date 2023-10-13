@@ -2,6 +2,8 @@ import os
 import urllib.request
 import json 
 from collections import defaultdict
+from pdfextractor import PDFExtractor
+from tqdm import tqdm
 
 class DatabaseMaker():
     def __init__(self, school_name, major_code, id_to_key):
@@ -22,21 +24,23 @@ class DatabaseMaker():
         return class_dict
     
     def add_classes(self):
-        for file_name in os.listdir('agreements/'):
-            if self.major_code not in file_name or 'report' not in file_name:
-                continue
+        files = [file_name for file_name in os.listdir(
+            'agreements/') if self.major_code in file_name and 'report' in file_name]
+        for file_name in tqdm(files, desc="Processing PDFs"):
             info = file_name.replace('.pdf', '').split('_')
             to_school_id = info[1]
             from_school_id = int(info[2])
-            extractor = PDF_Extractor(f'agreements/{file_name}')
+            extractor = PDFExtractor(f'agreements/{file_name}')
             classes = extractor.dict_from_file()
             for to_class in classes.keys():
-                from_class = {'school_id': from_school_id,
-                              'from_school': self.names[from_school_id],
-                              'equiv': classes[to_class],
-                              'key': id_to_key[from_school_id]}
+                from_class = {
+                    'school_id': from_school_id,
+                    'from_school': self.names[from_school_id],
+                    'equiv': classes[to_class],
+                    'key': self.id_to_key[from_school_id]
+                }
                 self.database[to_class].append(from_class)
         self.database = self.alphabetize_class_dict(self.database)
         json_name = f'agreements/{self.school_name}/{self.major_code}.json'
-        with open(json_name, "w") as out_file: 
+        with open(json_name, "w") as out_file:
             json.dump(self.database, out_file, indent=4)

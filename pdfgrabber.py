@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 
 class PDFGrabber():
-    def __init__(self, school_id=120, major='Game Design & Interactive Media, B.S.', major_code='GDIM', delay=0.5):
+    def __init__(self, school_name='UCSC', school_id=120, major='Game Design & Interactive Media, B.S.', major_code='GDIM', delay=0.5):
+        self.school_name = school_name
         self.school_id = school_id
         self.major = major
         self.major_code = major_code
@@ -56,7 +57,7 @@ class PDFGrabber():
     def get_pdfs(self):
         keys = self.get_keys()
         id_to_key = {}
-        save_directory = 'agreements'
+        save_directory = f'agreements/{self.school_name}'
 
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)

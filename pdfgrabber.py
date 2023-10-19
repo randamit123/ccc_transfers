@@ -4,6 +4,7 @@ import os
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+from PyPDF2 import PdfMerger
 
 
 class PDFGrabber():
@@ -94,5 +95,29 @@ class PDFGrabber():
 
         pdf_progress.close()
         print("Agreements stored")
+        self.combine_pdfs()
 
         return id_to_key
+
+    def combine_pdfs(self):
+        save_directory = f'agreements/{self.school_name}'
+
+        pdf_merger = PdfMerger()
+
+        for filename in os.listdir(save_directory):
+            if filename.endswith(".pdf"):
+                pdf_path = os.path.join(save_directory, filename)
+                pdf_merger.append(pdf_path)
+
+        combined_pdf_path = f'agreements/{self.school_name}/combined_{self.school_name}_agreements.pdf'
+
+        pdf_merger.write(combined_pdf_path)
+
+        pdf_merger.close()
+
+        for filename in os.listdir(save_directory):
+            if filename.endswith(".pdf") and 'report' in filename:
+                pdf_path = os.path.join(save_directory, filename)
+                os.remove(pdf_path)
+
+        print(f"PDF files combined and saved to '{combined_pdf_path}'.")

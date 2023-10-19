@@ -8,8 +8,8 @@ def main():
     print("Program Start:")
     grabber = PDFGrabber('UCI', 120, 'Computer Science, B.S.', 'CS', 0.2)
     grabber.get_pdfs()
-    cleaner = PDFCleaner()
-    cleaner.extract_text()
+    # cleaner = PDFCleaner()
+    # cleaner.extract_text()
 
     # maker = DatabaseMaker('UCI', 'CS', id_to_key)
     # print("Database made succesfully")

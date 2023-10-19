@@ -25,21 +25,30 @@ class DatabaseMaker():
         return class_dict
 
     def add_classes(self):
-        for file_name in os.listdir('agreements/'):
+        for file_name in os.listdir(f'agreements/{self.school_name}/'):
+            print(f"Checking file: {file_name}")
             if self.major_code not in file_name or 'report' not in file_name:
+                print("Condition not met.")
                 continue
             info = file_name.replace('.pdf', '').split('_')
             to_school_id = info[1]
             from_school_id = int(info[2])
-            extractor = PDFExtractor(f'agreements/{file_name}')
+            extractor = PDFExtractor(
+                f'agreements/{self.school_name}/{file_name}')
+            print("Check 1")
             classes = extractor.dict_from_file()
+            print("Check 2")
             for to_class in classes.keys():
+                print("Check 3")
                 from_class = {'school_id': from_school_id,
                               'from_school': self.names[from_school_id],
                               'equiv': classes[to_class],
                               'key': self.id_to_key[from_school_id]}
                 self.database[to_class].append(from_class)
+        print("Check 4")
         self.database = self.alphabetize_class_dict(self.database)
+        print("Check 5")
         json_name = f'agreements/{self.school_name}/{self.major_code}.json'
         with open(json_name, "w") as out_file:
             json.dump(self.database, out_file, indent=4)
+        print("Check 6")
